@@ -38,3 +38,6 @@
 inst
 obj
 run
+
+# Native Input Sets
+input_native.tar
