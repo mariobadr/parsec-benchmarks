@@ -19,7 +19,7 @@
 
 #include "fluid.hpp"
 #include "cellpool.hpp"
-#include "parsec_barrier.hpp"
+#include <pthread.h>
 
 #ifdef ENABLE_VISUALIZATION
 #include "fluidview.hpp"
