@@ -57,7 +57,7 @@ int XDIVS = 1;  // number of partitions in X
 int ZDIVS = 1;  // number of partitions in Z
 
 #define NUM_GRIDS  ((XDIVS) * (ZDIVS))
-#define MUTEXES_PER_CELL 128
+#define MUTEXES_PER_CELL 1
 #define CELL_MUTEX_ID 0
 
 struct Grid
