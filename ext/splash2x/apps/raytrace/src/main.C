@@ -364,7 +364,7 @@ CHAR	*argv[];
 	gm->pid    = 0;
 	gm->rid    = 1;
 
-	BARINIT(gm->start)
+	BARINIT(gm->start, gm->nprocs)
 	LOCKINIT(gm->pidlock)
 	LOCKINIT(gm->ridlock)
 	LOCKINIT(gm->memlock)

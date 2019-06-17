@@ -2,60 +2,15 @@ divert(-1)
 define(NEWPROC,) dnl
 
 define(BARRIER, `{
-	unsigned long	Error, Cycle;
-	int		Cancel, Temp;
-
-	Error = pthread_mutex_lock(&($1).mutex);
-	if (Error != 0) {
-		printf("Error while trying to get lock in barrier.\n");
-		exit(-1);
-	}
-
-	Cycle = ($1).cycle;
-	if (++($1).counter != ($2)) {
-		pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &Cancel);
-		while (Cycle == ($1).cycle) {
-			Error = pthread_cond_wait(&($1).cv, &($1).mutex);
-			if (Error != 0) {
-				break;
-			}
-		}
-		pthread_setcancelstate(Cancel, &Temp);
-	} else {
-		($1).cycle = !($1).cycle;
-		($1).counter = 0;
-		Error = pthread_cond_broadcast(&($1).cv);
-	}
-	pthread_mutex_unlock(&($1).mutex);
+	pthread_barrier_wait(&($1));
 }')
 
 define(BARDEC, `
-struct {
-	pthread_mutex_t	mutex;
-	pthread_cond_t	cv;
-	unsigned long	counter;
-	unsigned long	cycle;
-} ($1);
+pthread_barrier_t	($1);
 ')
 
 define(BARINIT, `{
-	unsigned long	Error;
-
-	Error = pthread_mutex_init(&($1).mutex, NULL);
-	if (Error != 0) {
-		printf("Error while initializing barrier.\n");
-		exit(-1);
-	}
-
-	Error = pthread_cond_init(&($1).cv, NULL);
-	if (Error != 0) {
-		printf("Error while initializing barrier.\n");
-		pthread_mutex_destroy(&($1).mutex);
-		exit(-1);
-	}
-
-	($1).counter = 0;
-	($1).cycle = 0;
+	pthread_barrier_init(&($1), NULL, $2);
 }')
 
 define(BAREXCLUDE, `{;}')
@@ -162,7 +117,7 @@ define(MEXIT, `{;}')
 define(MONINIT, `{;}')
 
 define(WAIT_FOR_END, `{
-	unsigned long	i, Error;
+	long	i, Error;
 	for (i = 0; i < ($1) - 1; i++) {
 		Error = pthread_join(PThreadTable[i], NULL);
 		if (Error != 0) {
@@ -194,6 +149,7 @@ define(MAIN_ENV,`
 #include <sys/time.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <malloc.h>
 #define MAX_THREADS 1024
 pthread_t PThreadTable[MAX_THREADS];
 ')
@@ -204,13 +160,9 @@ define(EXTERN_ENV, `
 #include <sys/time.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <malloc.h>
 extern pthread_t PThreadTable[];
 ')
-
-
-define(THREAD_INIT, `{;}')
-define(THREAD_INIT_FREE, `{;}')
-
 
 define(G_MALLOC, `malloc($1);')
 define(G_FREE, `;')
