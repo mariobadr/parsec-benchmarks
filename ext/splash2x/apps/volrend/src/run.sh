@@ -67,7 +67,7 @@ fi
 #Execution
 echo Generating input file ${INPUTFILE}...
 
-RUN="$PROG $PROGARGS"
+RUN="$INSTRUMENTATION $PROG $PROGARGS"
 
 echo "Running $RUN:"
 eval $RUN
